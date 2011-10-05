@@ -1,0 +1,4 @@
+dnacity
+*.o
+moc_*.cpp
+Makefile
