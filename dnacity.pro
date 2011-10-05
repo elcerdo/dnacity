@@ -1,4 +1,4 @@
-HEADERS = viewer.h
-SOURCES = viewer.cc
+HEADERS = viewer.h data.h
+SOURCES = viewer.cc data.cc
 QT += opengl
 SOURCES += main.cc
