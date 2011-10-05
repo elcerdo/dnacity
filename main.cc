@@ -4,8 +4,10 @@
 
 int main(int argc,char * argv[])
 {
+   
+    qsrand(time(NULL));
     QApplication app(argc,argv);
-
+   
     Building building =  Building::random(Rect(-.5,-.5,1,1));
 
     Viewer widget;
@@ -16,8 +18,3 @@ int main(int argc,char * argv[])
 
     return app.exec();
 }
-
-
-
-
-

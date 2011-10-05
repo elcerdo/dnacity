@@ -21,11 +21,8 @@ class Viewer : public QGLWidget
 	void setYRotation(int);
 	void setZRotation(int);
 
-	GLuint makeQtLogo() const;
 	GLuint makeBuilding(const Building& building) const;
 	void drawPiece(const Piece& piece) const;
-	void quad(double, double, double, double, double, double, double, double) const;
-	void extrude(double, double, double, double) const;
 	static void normalizeAngle(int&);
 
 	void initializeGL();
@@ -38,6 +35,10 @@ class Viewer : public QGLWidget
 	double xRot,yRot,zRot;
 	QPoint lastPos;
 	GLuint object;
+
+//	GLuint makeQtLogo() const;
+//	void quad(double, double, double, double, double, double, double, double) const;
+//	void extrude(double, double, double, double) const;
 };
 
 #endif

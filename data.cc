@@ -15,7 +15,11 @@ Point randPoint(const Rect& rect)
 
 Rect randRect(const Rect& rect)
 {
-    return Rect(randPoint(rect),randPoint(rect));
+    const Point p0 = randPoint(rect);
+    const Point p1 = randPoint(rect);
+    const Point topLeft(qMin(p0.x(),p1.x()),qMin(p0.y(),p1.y()));
+    const Point bottomRight(qMax(p0.x(),p1.x()),qMax(p0.y(),p1.y()));
+    return Rect(topLeft,bottomRight);
 }
 
 Piece Piece::random(const Rect& rect)
