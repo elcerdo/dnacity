@@ -2,6 +2,7 @@
 #define __VIEWER_HH__
 
 #include <QMouseEvent>
+#include <QKeyEvent>
 #include <QGLWidget>
 #include "data.h"
 
@@ -29,6 +30,7 @@ class Viewer : public QGLWidget
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
+    void keyPressEvent(QKeyEvent * event);
 
 	void resizeGL(int width, int height);
 

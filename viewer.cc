@@ -104,6 +104,13 @@ void Viewer::mousePressEvent(QMouseEvent *event)
     lastPos = event->pos();
 }
 
+void Viewer::keyPressEvent(QKeyEvent * event) {
+    /// BOUH que c'est saaaale ! à virer du viewer !
+    if(event->text() == " ")
+        this->showBuilding(Building::random(Rect(-.5,-.5,1,1)));
+
+}
+
 void Viewer::mouseMoveEvent(QMouseEvent *event)
 {
     int dx = event->x() - lastPos.x();
