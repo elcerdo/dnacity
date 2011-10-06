@@ -11,9 +11,9 @@ void Viewer::setXRotation(int angle)
 {
     normalizeAngle(angle);
     if (angle != xRot) {
-	xRot = angle;
-	emit xRotationChanged(angle);
-	updateGL();
+        xRot = angle;
+        emit xRotationChanged(angle);
+        updateGL();
     }
 }
 
@@ -21,9 +21,9 @@ void Viewer::setYRotation(int angle)
 {
     normalizeAngle(angle);
     if (angle != yRot) {
-	yRot = angle;
-	emit yRotationChanged(angle);
-	updateGL();
+        yRot = angle;
+        emit yRotationChanged(angle);
+        updateGL();
     }
 }
 
@@ -31,9 +31,9 @@ void Viewer::setZRotation(int angle)
 {
     normalizeAngle(angle);
     if (angle != zRot) {
-	zRot = angle;
-	emit zRotationChanged(angle);
-	updateGL();
+        zRot = angle;
+        emit zRotationChanged(angle);
+        updateGL();
     }
 }
 
@@ -46,22 +46,19 @@ void Viewer::initializeGL()
     //glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
 
+    GLfloat global_ambient[] = { -1, -1, -1, 1 };
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
+
 
     glEnable(GL_LIGHT0);
-    GLfloat ambient[] = {1.2, 1.2, 1.2, 1.0 };
-    GLfloat diffuse[] = { 0.0, 0.0, 0.0, 1 };
+    GLfloat ambient[] = {0.00, 0.0, 0.0, 1.0 };
+    GLfloat diffuse[] = { 0.1, 0.1, 0.1, 1 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
-    GLfloat position[] = { -1, -1, 0.5, 0.0 };
+    GLfloat position[] = { -10, -10, 0.5, 0.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 
-    glEnable(GL_LIGHT1);
-    GLfloat ambient1[] = {0.0, 0.0, 0.0, 1.0 };
-    GLfloat diffuse1[] = { 0.9, 0.9, 0.9, 1 };
-    glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
-    GLfloat position1[] = { -10, -10, -10, 0.0 };
-    glLightfv(GL_LIGHT1, GL_POSITION, position);
 }
 
 void Viewer::paintGL()
@@ -74,15 +71,30 @@ void Viewer::paintGL()
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
     glCallList(object);
 
+    glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+    glEnable ( GL_COLOR_MATERIAL ) ;
+
+
     qglColor(qRgb(150,150,150));
     glBegin(GL_QUADS);
         glNormal3d(0,0,1);
-        glVertex3d(-2, 2, 0);
-        glVertex3d(2,  2, 0);
-        glVertex3d(2,  -2, 0);
-        glVertex3d(-2,  -2, 0);
-        
+        glVertex3d(-0.5, 0.5, 0.);
+        glVertex3d(0.5,  0.5, 0.);
+        glVertex3d(0.5,  -0.5, 0.);
+        glVertex3d(-0.5,  -0.5, 0.);
     glEnd();
+
+    qglColor(qRgb(20,250,20));
+    glBegin(GL_QUADS);
+        glNormal3d(0,0,1);
+        glVertex3d(-0.6, 0.6, -0.001);
+        glVertex3d(0.6,  0.6, -0.001);
+        glVertex3d(0.6,  -0.6, -0.001);
+        glVertex3d(-0.6,  -0.6, -0.001);
+    glEnd();
+
+//    glDisable ( GL_COLOR_MATERIAL ) ;
+
 }
 
 void Viewer::resizeGL(int width, int height)
@@ -195,7 +207,6 @@ void Viewer::drawPiece(const Piece& piece) const
     glEnd();
 
     // draw edges
-    glDisable(GL_LIGHTING);
     qglColor(Qt::white);
     glBegin(GL_LINE_STRIP);
     glNormal3d(-1,1,0); glVertex3d(piece.base.left(), piece.base.top(), 0);
@@ -223,7 +234,6 @@ void Viewer::drawPiece(const Piece& piece) const
     glVertex3d(piece.base.right(), piece.base.bottom(), 0);
     glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
     glEnd();
-    glEnable(GL_LIGHTING);
 }
 
 

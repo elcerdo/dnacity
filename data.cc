@@ -38,6 +38,10 @@ Piece Piece::random(const Rect& rect)
 }
 
 bool isPieceAccepted(Pieces listPieces, Piece candidat) {
+    // Non aux lamelles
+    if(candidat.base.width() < 0.1 || candidat.base.height() < 0.1)
+        return false;
+
     //  Evite qu'une pièce soit totalement à l'intérieur d'une autre
     foreach(Piece p, listPieces)
         if(p.base.contains(candidat.base) && p.height > candidat.height)
@@ -57,7 +61,7 @@ Building Building::random(const Rect& rect)
         do {
             p = Piece::random(rect);
         } while(!isPieceAccepted(building.pieces, p));
-        building.pieces.append(Piece::random(rect));
+        building.pieces.append(p);
     }
     return building;
 }
