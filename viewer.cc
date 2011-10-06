@@ -46,9 +46,11 @@ void Viewer::initializeGL()
     //glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
 
+    glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+    glEnable ( GL_COLOR_MATERIAL ) ;
+
     GLfloat global_ambient[] = { -1, -1, -1, 1 };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
-
 
     glEnable(GL_LIGHT0);
     GLfloat ambient[] = {0.00, 0.0, 0.0, 1.0 };
@@ -70,31 +72,6 @@ void Viewer::paintGL()
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
     glCallList(object);
-
-    glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
-    glEnable ( GL_COLOR_MATERIAL ) ;
-
-
-    qglColor(qRgb(150,150,150));
-    glBegin(GL_QUADS);
-        glNormal3d(0,0,1);
-        glVertex3d(-0.5, 0.5, 0.);
-        glVertex3d(0.5,  0.5, 0.);
-        glVertex3d(0.5,  -0.5, 0.);
-        glVertex3d(-0.5,  -0.5, 0.);
-    glEnd();
-
-    qglColor(qRgb(20,250,20));
-    glBegin(GL_QUADS);
-        glNormal3d(0,0,1);
-        glVertex3d(-0.6, 0.6, -0.001);
-        glVertex3d(0.6,  0.6, -0.001);
-        glVertex3d(0.6,  -0.6, -0.001);
-        glVertex3d(-0.6,  -0.6, -0.001);
-    glEnd();
-
-//    glDisable ( GL_COLOR_MATERIAL ) ;
-
 }
 
 void Viewer::resizeGL(int width, int height)
@@ -140,22 +117,45 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 
 void Viewer::showBuilding(const Building& building)
 {
-    object = makeBuilding(building);
+    object = prepareBuilding(building);
     updateGL();
 }
 
-GLuint Viewer::makeBuilding(const Building& building) const
+GLuint Viewer::prepareBuilding(const Building& building) const
 {
     GLuint list = glGenLists(1);
+
     glNewList(list, GL_COMPILE);
 
-    foreach (const Piece& piece, building.pieces) drawPiece(piece);
+    foreach (const Piece& piece, building.pieces) 
+        drawPiece(piece);
+    drawEnvironment();
 
     glEndList();
+
     return list;
 }
 
 
+void Viewer::drawEnvironment() const {
+    qglColor(qRgb(150,150,150));
+    glBegin(GL_QUADS);
+        glNormal3d(0,0,1);
+        glVertex3d(-0.5, 0.5, 0.);
+        glVertex3d(0.5,  0.5, 0.);
+        glVertex3d(0.5,  -0.5, 0.);
+        glVertex3d(-0.5,  -0.5, 0.);
+    glEnd();
+
+    qglColor(qRgb(20,250,20));
+    glBegin(GL_QUADS);
+        glNormal3d(0,0,1);
+        glVertex3d(-0.6, 0.6, -0.001);
+        glVertex3d(0.6,  0.6, -0.001);
+        glVertex3d(0.6,  -0.6, -0.001);
+        glVertex3d(-0.6,  -0.6, -0.001);
+    glEnd();
+}
 
 void Viewer::drawPiece(const Piece& piece) const
 {

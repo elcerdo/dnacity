@@ -22,8 +22,10 @@ class Viewer : public QGLWidget
 	void setYRotation(int);
 	void setZRotation(int);
 
-	GLuint makeBuilding(const Building& building) const;
+	GLuint prepareBuilding(const Building& building) const;
 	void drawPiece(const Piece& piece) const;
+    void drawEnvironment() const;
+
 	static void normalizeAngle(int&);
 
 	void initializeGL();
