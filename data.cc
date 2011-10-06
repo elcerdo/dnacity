@@ -37,7 +37,12 @@ Piece Piece::random(const Rect& rect)
     return piece;
 }
 
-bool isPieceAccepted(Pieces listPieces, Piece p) {
+bool isPieceAccepted(Pieces listPieces, Piece candidat) {
+    //  Evite qu'une pièce soit totalement à l'intérieur d'une autre
+    foreach(Piece p, listPieces)
+        if(p.base.contains(candidat.base) && p.height > candidat.height)
+            return false;
+
     return true;
 }
 
