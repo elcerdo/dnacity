@@ -29,10 +29,10 @@ Rect randRect(const Rect& rect)
     return Rect(topLeft,bottomRight);
 }
 
-Piece Piece::random(const Rect& rect)
+Piece Piece::random(const Rect& rect, qreal minHeight, qreal maxHeight)
 {
     Piece piece;
-    piece.height = randFlat(.3,.6);
+    piece.height = randFlat(minHeight,maxHeight);
     piece.base = randRect(rect);
     return piece;
 }
@@ -51,18 +51,20 @@ bool isPieceAccepted(Pieces listPieces, Piece candidat) {
 }
 
 
-Building Building::random(const Rect& rect)
-{
+
+Building Building::random(const Rect& rect, int minPieces, int maxPieces, qreal minHeight, qreal maxHeight) {
     Building building;
     Piece p;
-    int nbPieces = randFlat(3,6);
+    int nbPieces = randFlat(minPieces,maxPieces);
 
     for (int kk=0; kk<nbPieces; kk++) {
         do {
-            p = Piece::random(rect);
+            p = Piece::random(rect, minHeight, maxHeight);
         } while(!isPieceAccepted(building.pieces, p));
         building.pieces.append(p);
     }
     return building;
+
 }
+
 
