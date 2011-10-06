@@ -45,17 +45,23 @@ void Viewer::initializeGL()
     glLineWidth(2.);
     //glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
 
-    GLfloat global_ambient[] = { 0.5, 0.5, 0.5, 1 };
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
-    GLfloat ambient[] = { 0.1f, 0.1f, 0.1f };
+
+    glEnable(GL_LIGHT0);
+    GLfloat ambient[] = {1.2, 1.2, 1.2, 1.0 };
+    GLfloat diffuse[] = { 0.0, 0.0, 0.0, 1 };
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    GLfloat position[] = { -1, 1, -4, 1 };
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    GLfloat position[] = { -1, -1, 0.5, 0.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 
-
-    glShadeModel(GL_SMOOTH);
+    glEnable(GL_LIGHT1);
+    GLfloat ambient1[] = {0.0, 0.0, 0.0, 1.0 };
+    GLfloat diffuse1[] = { 0.9, 0.9, 0.9, 1 };
+    glLightfv(GL_LIGHT1, GL_AMBIENT, ambient1);
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse1);
+    GLfloat position1[] = { -10, -10, -10, 0.0 };
+    glLightfv(GL_LIGHT1, GL_POSITION, position);
 }
 
 void Viewer::paintGL()
@@ -137,36 +143,43 @@ void Viewer::drawPiece(const Piece& piece) const
     // draw faces
     qglColor(qRgb(220,220,225));
     glBegin(GL_QUADS);
+
+    // Sol
     glNormal3d(0,0,-1);
     glVertex3d(piece.base.left(), piece.base.top(), 0);
     glVertex3d(piece.base.right(), piece.base.top(), 0);
     glVertex3d(piece.base.right(), piece.base.bottom(), 0);
     glVertex3d(piece.base.left(), piece.base.bottom(), 0);
 
+    // Plafond
     glNormal3d(0,0,1);
     glVertex3d(piece.base.left(), piece.base.top(), piece.height);
     glVertex3d(piece.base.right(), piece.base.top(), piece.height);
     glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
     glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
 
-    glNormal3d(0,1,0);
+    // Derrière
+    glNormal3d(0,-1,0);
     glVertex3d(piece.base.left(), piece.base.top(), piece.height);
     glVertex3d(piece.base.left(), piece.base.top(), 0);
     glVertex3d(piece.base.right(), piece.base.top(), 0);
     glVertex3d(piece.base.right(), piece.base.top(), piece.height);
 
+    // Droite
     glNormal3d(1,0,0);
     glVertex3d(piece.base.right(), piece.base.top(), piece.height);
     glVertex3d(piece.base.right(), piece.base.top(), 0);
     glVertex3d(piece.base.right(), piece.base.bottom(), 0);
     glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
 
-    glNormal3d(0,-1,0);
+    // Devant
+    glNormal3d(0,1,0);
     glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
     glVertex3d(piece.base.right(), piece.base.bottom(), 0);
     glVertex3d(piece.base.left(), piece.base.bottom(), 0);
     glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
 
+    // Gauche
     glNormal3d(-1,0,0);
     glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
     glVertex3d(piece.base.left(), piece.base.bottom(), 0);
