@@ -2,6 +2,13 @@
 
 #include <cstdlib>
 
+
+int randFlat(int min, int max)
+{
+    const int alpha = qrand()%(max-min);
+    return min + alpha;
+}
+
 qreal randFlat(qreal min, qreal max)
 {
     const qreal alpha = static_cast<qreal>(qrand())/RAND_MAX;
@@ -30,10 +37,23 @@ Piece Piece::random(const Rect& rect)
     return piece;
 }
 
+bool isPieceAccepted(Pieces listPieces, Piece p) {
+    return true;
+}
+
+
 Building Building::random(const Rect& rect)
 {
     Building building;
-    for (int kk=0; kk<3; kk++) building.pieces.append(Piece::random(rect));
+    Piece p;
+    int nbPieces = randFlat(3,6);
+
+    for (int kk=0; kk<nbPieces; kk++) {
+        do {
+            p = Piece::random(rect);
+        } while(!isPieceAccepted(building.pieces, p));
+        building.pieces.append(Piece::random(rect));
+    }
     return building;
 }
 
