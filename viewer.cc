@@ -188,6 +188,7 @@ void Viewer::drawPiece(const Piece& piece) const
     glEnd();
 
     // draw edges
+    glDisable(GL_LIGHTING);
     qglColor(Qt::white);
     glBegin(GL_LINE_STRIP);
     glNormal3d(-1,1,0); glVertex3d(piece.base.left(), piece.base.top(), 0);
@@ -215,6 +216,7 @@ void Viewer::drawPiece(const Piece& piece) const
     glVertex3d(piece.base.right(), piece.base.bottom(), 0);
     glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
     glEnd();
+    glEnable(GL_LIGHTING);
 }
 
 
