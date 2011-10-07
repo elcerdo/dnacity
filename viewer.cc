@@ -37,6 +37,13 @@ void Viewer::setZRotation(int angle)
     }
 }
 
+void Viewer::setScale(qreal _scale) {
+    if(_scale > 0) {
+        scale = _scale;
+        updateGL();
+    }
+}
+
 void Viewer::initializeGL()
 {
     { // load textures
@@ -50,6 +57,8 @@ void Viewer::initializeGL()
     qglClearColor(Qt::black);
     glLineWidth(2.);
     glShadeModel(GL_SMOOTH);
+
+    scale=1.0; xRot=0.0; yRot=0.0; zRot=0.0;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -76,8 +85,10 @@ void Viewer::initializeGL()
 
 void Viewer::paintGL()
 {
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+    glScalef(scale, scale, scale);
     glTranslated(0.0, 0.0, -10.0);
     glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
@@ -95,7 +106,7 @@ void Viewer::resizeGL(int width, int height)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-xratio, +xratio, +yratio, -yratio, 4.0, 15.0);
+    glOrtho(-xratio, +xratio, +yratio, -yratio, 2.0, 25.0);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -116,7 +127,9 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();
 
-    if (event->buttons() & Qt::LeftButton) {
+    if (event->buttons() & Qt::MidButton) {
+        setScale(scale - (dy/100.0));
+    } else if (event->buttons() & Qt::LeftButton) {
         setXRotation(xRot - 8 * dy);
         setYRotation(yRot + 8 * dx);
     } else if (event->buttons() & Qt::RightButton) {

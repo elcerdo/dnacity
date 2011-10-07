@@ -21,6 +21,7 @@ class Viewer : public QGLWidget
 	void setXRotation(int);
 	void setYRotation(int);
 	void setZRotation(int);
+    void setScale(qreal scale);
 
 	GLuint prepareBuilding(const Building& building) const;
 	void drawPiece(const Piece& piece) const;
@@ -36,7 +37,8 @@ class Viewer : public QGLWidget
 
 	void resizeGL(int width, int height);
 
-	double xRot,yRot,zRot;
+	qreal xRot,yRot,zRot;
+    qreal scale;
 	QPoint lastPos;
 	GLuint object;
 	GLuint textures[6];
