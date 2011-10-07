@@ -1,3 +1,4 @@
+RESOURCES = textures.qrc
 HEADERS = viewer.h data.h
 SOURCES = viewer.cc data.cc
 QT += opengl

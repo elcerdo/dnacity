@@ -17,7 +17,7 @@ struct Piece {
 typedef QList<Piece> Pieces;
 
 struct Building {
-    static Building random(const Rect& rect, int minPieces=3, int maxPieces=6, qreal minHeight=0.3, qreal maxHeight=0.7);
+    static Building random(const Rect& rect, int minPieces=3, int maxPieces=6, qreal minHeight=0.3, qreal maxHeight=1.7);
     Pieces pieces;
     Rect bounding;
 };

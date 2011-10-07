@@ -32,13 +32,14 @@ class Viewer : public QGLWidget
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
-    void keyPressEvent(QKeyEvent * event);
+	void keyPressEvent(QKeyEvent * event);
 
 	void resizeGL(int width, int height);
 
 	double xRot,yRot,zRot;
 	QPoint lastPos;
 	GLuint object;
+	GLuint textures[6];
 
 //	GLuint makeQtLogo() const;
 //	void quad(double, double, double, double, double, double, double, double) const;

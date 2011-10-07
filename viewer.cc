@@ -39,15 +39,26 @@ void Viewer::setZRotation(int angle)
 
 void Viewer::initializeGL()
 {
+    { // load textures
+	textures[0] = bindTexture(QPixmap(":/textures/debug"),GL_TEXTURE_2D);
+	textures[1] = bindTexture(QPixmap(":/textures/road"),GL_TEXTURE_2D);
+	textures[2] = bindTexture(QPixmap(":/textures/window"),GL_TEXTURE_2D);
+	textures[3] = bindTexture(QPixmap(":/textures/grass"),GL_TEXTURE_2D);
+	textures[4] = bindTexture(QPixmap(":/textures/roof"),GL_TEXTURE_2D);
+    }
+
     qglClearColor(Qt::black);
-    glShadeModel(GL_FLAT);
-    glEnable(GL_DEPTH_TEST);
     glLineWidth(2.);
-    //glEnable(GL_CULL_FACE);
+    glShadeModel(GL_SMOOTH);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
+    glEnable(GL_AUTO_NORMAL);
 
     glColorMaterial ( GL_FRONT_AND_BACK, GL_EMISSION ) ;
     glEnable ( GL_COLOR_MATERIAL ) ;
+    glEnable(GL_TEXTURE_2D);
 
     GLfloat global_ambient[] = { -1, -1, -1, 1 };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, global_ambient);
@@ -95,7 +106,7 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 
 void Viewer::keyPressEvent(QKeyEvent * event) {
     /// BOUH que c'est saaaale ! à virer du viewer !
-    if(event->text() == " ")
+    if(event->key() == Qt::Key_Space)
         this->showBuilding(Building::random(Rect(-.5,-.5,1,1)));
 
 }
@@ -138,102 +149,114 @@ GLuint Viewer::prepareBuilding(const Building& building) const
 
 
 void Viewer::drawEnvironment() const {
-    qglColor(qRgb(150,150,150));
-    glBegin(GL_QUADS);
-        glNormal3d(0,0,1);
-        glVertex3d(-0.5, 0.5, 0.);
-        glVertex3d(0.5,  0.5, 0.);
-        glVertex3d(0.5,  -0.5, 0.);
-        glVertex3d(-0.5,  -0.5, 0.);
-    glEnd();
+    {
+	glBindTexture(GL_TEXTURE_2D,textures[3]);
+	glBegin(GL_QUADS);
+	glTexCoord2d(0,0); glVertex3d(-0.5, 0.5, 0.);
+	glTexCoord2d(1,0); glVertex3d(0.5,  0.5, 0.);
+	glTexCoord2d(1,1); glVertex3d(0.5,  -0.5, 0.);
+	glTexCoord2d(0,1); glVertex3d(-0.5,  -0.5, 0.);
+	glEnd();
+    }
 
-    qglColor(qRgb(20,250,20));
-    glBegin(GL_QUADS);
-        glNormal3d(0,0,1);
-        glVertex3d(-0.6, 0.6, -0.001);
-        glVertex3d(0.6,  0.6, -0.001);
-        glVertex3d(0.6,  -0.6, -0.001);
-        glVertex3d(-0.6,  -0.6, -0.001);
-    glEnd();
+    {
+	glBindTexture(GL_TEXTURE_2D,textures[1]);
+	glBegin(GL_QUADS);
+	glTexCoord2d(0,1); glVertex3d(-0.6, 0.6, -0.001);
+	glTexCoord2d(1,1); glVertex3d(0.6,  0.6, -0.001);
+	glTexCoord2d(1,0); glVertex3d(0.6,  -0.6, -0.001);
+	glTexCoord2d(0,0); glVertex3d(-0.6,  -0.6, -0.001);
+	glEnd();
+    }
 }
 
 void Viewer::drawPiece(const Piece& piece) const
 {
-    // draw faces
-    qglColor(qRgb(220,220,225));
-    glBegin(GL_QUADS);
 
-    // Sol
-    glNormal3d(0,0,-1);
-    glVertex3d(piece.base.left(), piece.base.top(), 0);
-    glVertex3d(piece.base.right(), piece.base.top(), 0);
-    glVertex3d(piece.base.right(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.left(), piece.base.bottom(), 0);
+    { // draw faces
+	// Sol
+	glBegin(GL_QUADS);
+	glVertex3d(piece.base.left(), piece.base.top(), 0);
+	glVertex3d(piece.base.right(), piece.base.top(), 0);
+	glVertex3d(piece.base.right(), piece.base.bottom(), 0);
+	glVertex3d(piece.base.left(), piece.base.bottom(), 0);
+	glEnd();
 
-    // Plafond
-    glNormal3d(0,0,1);
-    glVertex3d(piece.base.left(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
-    glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	// Plafond
+	glBindTexture(GL_TEXTURE_2D,textures[4]);
+	glBegin(GL_QUADS);
+	glTexCoord2d(piece.base.width(),piece.base.height()); glVertex3d(piece.base.right(), piece.base.top(), piece.height);
+	glTexCoord2d(0,piece.base.height()); glVertex3d(piece.base.left(), piece.base.top(), piece.height);
+	glTexCoord2d(0,0); glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	glTexCoord2d(piece.base.width(),0); glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
+	glEnd();
 
-    // Derrière
-    glNormal3d(0,-1,0);
-    glVertex3d(piece.base.left(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.left(), piece.base.top(), 0);
-    glVertex3d(piece.base.right(), piece.base.top(), 0);
-    glVertex3d(piece.base.right(), piece.base.top(), piece.height);
+	// Derrière
+	glBindTexture(GL_TEXTURE_2D,textures[2]);
+	glBegin(GL_QUADS);
+	glTexCoord2d(piece.base.width(),-piece.height); glVertex3d(piece.base.left(), piece.base.top(), 0);
+	glTexCoord2d(piece.base.width(),0); glVertex3d(piece.base.left(), piece.base.top(), piece.height);
+	glTexCoord2d(0,0); glVertex3d(piece.base.right(), piece.base.top(), piece.height);
+	glTexCoord2d(0,-piece.height); glVertex3d(piece.base.right(), piece.base.top(), 0);
+	glEnd();
 
-    // Droite
-    glNormal3d(1,0,0);
-    glVertex3d(piece.base.right(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.top(), 0);
-    glVertex3d(piece.base.right(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
+	// Droite
+	glBegin(GL_QUADS);
+	glTexCoord2d(piece.base.height(),-piece.height); glVertex3d(piece.base.right(), piece.base.top(), 0);
+	glTexCoord2d(piece.base.height(),0); glVertex3d(piece.base.right(), piece.base.top(), piece.height);
+	glTexCoord2d(0,0); glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
+	glTexCoord2d(0,-piece.height); glVertex3d(piece.base.right(), piece.base.bottom(), 0);
+	glEnd();
 
-    // Devant
-    glNormal3d(0,1,0);
-    glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.left(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	// Devant
+	glBegin(GL_QUADS);
+	glTexCoord2d(piece.base.width(),-piece.height); glVertex3d(piece.base.right(), piece.base.bottom(), 0);
+	glTexCoord2d(piece.base.width(),0); glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
+	glTexCoord2d(0,0); glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	glTexCoord2d(0,-piece.height); glVertex3d(piece.base.left(), piece.base.bottom(), 0);
+	glEnd();
 
-    // Gauche
-    glNormal3d(-1,0,0);
-    glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
-    glVertex3d(piece.base.left(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.left(), piece.base.top(), 0);
-    glVertex3d(piece.base.left(), piece.base.top(), piece.height);
-    glEnd();
+	// Gauche
+	glBegin(GL_QUADS);
+	glTexCoord2d(piece.base.height(),-piece.height); glVertex3d(piece.base.left(), piece.base.bottom(), 0);
+	glTexCoord2d(piece.base.height(),0); glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	glTexCoord2d(0,0); glVertex3d(piece.base.left(), piece.base.top(), piece.height);
+	glTexCoord2d(0,-piece.height); glVertex3d(piece.base.left(), piece.base.top(), 0);
+	glEnd();
+    }
 
-    // draw edges
-    qglColor(Qt::white);
-    glBegin(GL_LINE_STRIP);
-    glNormal3d(-1,1,0); glVertex3d(piece.base.left(), piece.base.top(), 0);
-    glNormal3d(1,1,0); glVertex3d(piece.base.right(), piece.base.top(), 0);
-    glNormal3d(1,-1,0); glVertex3d(piece.base.right(), piece.base.bottom(), 0);
-    glNormal3d(-1,-1,0); glVertex3d(piece.base.left(), piece.base.bottom(), 0);
-    glNormal3d(-1,1,0); glVertex3d(piece.base.left(), piece.base.top(), 0);
-    glEnd();
+    { // draw edges
+	qglColor(Qt::red);
 
-    glBegin(GL_LINE_STRIP);
-    glVertex3d(piece.base.left(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
-    glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
-    glVertex3d(piece.base.left(), piece.base.top(), piece.height);
-    glEnd();
+	glBegin(GL_LINE_STRIP);
+	glVertex3d(piece.base.left(), piece.base.top(), 0);
+	glVertex3d(piece.base.right(), piece.base.top(), 0);
+	glVertex3d(piece.base.right(), piece.base.bottom(), 0);
+	glVertex3d(piece.base.left(), piece.base.bottom(), 0);
+	glVertex3d(piece.base.left(), piece.base.top(), 0);
+	glEnd();
 
-    glBegin(GL_LINES);
-    glVertex3d(piece.base.left(), piece.base.top(), 0);
-    glVertex3d(piece.base.left(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.top(), 0);
-    glVertex3d(piece.base.right(), piece.base.top(), piece.height);
-    glVertex3d(piece.base.left(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
-    glVertex3d(piece.base.right(), piece.base.bottom(), 0);
-    glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
-    glEnd();
+	glBegin(GL_LINE_STRIP);
+	glVertex3d(piece.base.left(), piece.base.top(), piece.height);
+	glVertex3d(piece.base.right(), piece.base.top(), piece.height);
+	glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
+	glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	glVertex3d(piece.base.left(), piece.base.top(), piece.height);
+	glEnd();
+
+	glBegin(GL_LINES);
+	glVertex3d(piece.base.left(), piece.base.top(), 0);
+	glVertex3d(piece.base.left(), piece.base.top(), piece.height);
+	glVertex3d(piece.base.right(), piece.base.top(), 0);
+	glVertex3d(piece.base.right(), piece.base.top(), piece.height);
+	glVertex3d(piece.base.left(), piece.base.bottom(), 0);
+	glVertex3d(piece.base.left(), piece.base.bottom(), piece.height);
+	glVertex3d(piece.base.right(), piece.base.bottom(), 0);
+	glVertex3d(piece.base.right(), piece.base.bottom(), piece.height);
+	glEnd();
+
+	qglColor(Qt::white);
+    }
 }
 
 
