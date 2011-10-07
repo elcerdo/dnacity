@@ -1,10 +1,12 @@
 #include "viewer.h"
 
+#include <QDebug>
 #include <cmath>
 
 Viewer::Viewer(QWidget* parent) :
     QGLWidget(parent)
 {
+    scale = 1;
 }
 
 void Viewer::setXRotation(int angle)
@@ -93,6 +95,8 @@ void Viewer::paintGL()
     glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
+    glScaled(scale,scale,scale);
+    glTranslated(0.0, 0.0, -1.0);
     glCallList(object);
 }
 
@@ -117,8 +121,23 @@ void Viewer::mousePressEvent(QMouseEvent *event)
 
 void Viewer::keyPressEvent(QKeyEvent * event) {
     /// BOUH que c'est saaaale ! à virer du viewer !
-    if(event->key() == Qt::Key_Space)
-        this->showBuilding(Building::random(Rect(-.5,-.5,1,1)));
+    if(event->key() == Qt::Key_Space) {
+        showBuilding(Building::random(Rect(-.5,-.5,1,1)));
+	event->accept();
+    }
+
+    if (event->key() == Qt::Key_C) {
+	object = glGenLists(1);
+	glNewList(object, GL_COMPILE);
+	for (int ii=-4; ii<5; ii++)
+	    for (int jj=-4; jj<5; jj++)
+		prepareBuilding(Building::random(Rect(-.5+ii,-.5+jj,1,1)));
+	drawEnvironment(Rect(-5,-5,10,10));
+	glEndList();
+	updateGL();
+	event->accept();
+    }
+
 
 }
 
@@ -141,46 +160,48 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
 
 void Viewer::showBuilding(const Building& building)
 {
-    object = prepareBuilding(building);
+    object = glGenLists(1);
+    glNewList(object, GL_COMPILE);
+    prepareBuilding(building);
+    drawEnvironment(building.bounding);
+    glEndList();
     updateGL();
 }
 
-GLuint Viewer::prepareBuilding(const Building& building) const
+void Viewer::prepareBuilding(const Building& building) const
 {
-    GLuint list = glGenLists(1);
-
-    glNewList(list, GL_COMPILE);
-
     foreach (const Piece& piece, building.pieces) 
         drawPiece(piece);
-    drawEnvironment();
-
-    glEndList();
-
-    return list;
 }
 
 
-void Viewer::drawEnvironment() const {
+void Viewer::drawEnvironment(const Rect& rect) const {
     {
 	glBindTexture(GL_TEXTURE_2D,textures[3]);
 	glBegin(GL_QUADS);
-	glTexCoord2d(0,0); glVertex3d(-0.5, 0.5, 0.);
-	glTexCoord2d(1,0); glVertex3d(0.5,  0.5, 0.);
-	glTexCoord2d(1,1); glVertex3d(0.5,  -0.5, 0.);
-	glTexCoord2d(0,1); glVertex3d(-0.5,  -0.5, 0.);
+	glTexCoord2d(0,0); glVertex3d(rect.left(), rect.bottom(), 0.);
+	glTexCoord2d(rect.width(),0); glVertex3d(rect.right(), rect.bottom(), 0.);
+	glTexCoord2d(rect.width(),rect.height()); glVertex3d(rect.right(), rect.top(), 0.);
+	glTexCoord2d(0,rect.height()); glVertex3d(rect.left(), rect.top(), 0.);
 	glEnd();
     }
 
     {
 	glBindTexture(GL_TEXTURE_2D,textures[1]);
 	glBegin(GL_QUADS);
-	glTexCoord2d(0,1); glVertex3d(-0.6, 0.6, -0.001);
-	glTexCoord2d(1,1); glVertex3d(0.6,  0.6, -0.001);
-	glTexCoord2d(1,0); glVertex3d(0.6,  -0.6, -0.001);
-	glTexCoord2d(0,0); glVertex3d(-0.6,  -0.6, -0.001);
+	glTexCoord2d(0,0); glVertex3d(rect.left()-.5, rect.bottom()+.5, -1e-5);
+	glTexCoord2d(rect.width(),0); glVertex3d(rect.right()+.5, rect.bottom()+.5, -1e-5);
+	glTexCoord2d(rect.width(),rect.height()); glVertex3d(rect.right()+.5, rect.top()-.5, -1e-5);
+	glTexCoord2d(0,rect.height()); glVertex3d(rect.left()-.5, rect.top()-.5, -1e-5);
 	glEnd();
     }
+}
+
+void Viewer::wheelEvent(QWheelEvent* event)
+{
+    if (event->delta()>0) scale*=1.1;
+    if (event->delta()<0) scale/=1.1;
+    updateGL();
 }
 
 void Viewer::drawPiece(const Piece& piece) const

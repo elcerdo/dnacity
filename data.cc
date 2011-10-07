@@ -54,6 +54,7 @@ bool isPieceAccepted(Pieces listPieces, Piece candidat) {
 
 Building Building::random(const Rect& rect, int minPieces, int maxPieces, qreal minHeight, qreal maxHeight) {
     Building building;
+    building.bounding = rect;
     Piece p;
     int nbPieces = randFlat(minPieces,maxPieces);
 
