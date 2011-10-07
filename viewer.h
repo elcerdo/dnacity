@@ -2,6 +2,7 @@
 #define __VIEWER_HH__
 
 #include <QMouseEvent>
+#include <QWheelEvent>
 #include <QKeyEvent>
 #include <QGLWidget>
 #include "data.h"
@@ -23,9 +24,9 @@ class Viewer : public QGLWidget
 	void setZRotation(int);
     void setScale(qreal scale);
 
-	GLuint prepareBuilding(const Building& building) const;
+	void prepareBuilding(const Building& building) const;
 	void drawPiece(const Piece& piece) const;
-    void drawEnvironment() const;
+	void drawEnvironment(const Rect& rect) const;
 
 	static void normalizeAngle(int&);
 
@@ -33,12 +34,14 @@ class Viewer : public QGLWidget
 	void paintGL();
 	void mousePressEvent(QMouseEvent* event);
 	void mouseMoveEvent(QMouseEvent* event);
+	void wheelEvent(QWheelEvent* event);
 	void keyPressEvent(QKeyEvent * event);
 
 	void resizeGL(int width, int height);
 
 	qreal xRot,yRot,zRot;
     qreal scale;
+
 	QPoint lastPos;
 	GLuint object;
 	GLuint textures[6];
