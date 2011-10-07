@@ -2,9 +2,9 @@
 <qresource>
 	<file alias="textures/road">images/road.png</file>
 	<file alias="textures/grass">images/grass.jpg</file>
-	<file alias="textures/window">images/window.jpg</file>
+	<file alias="textures/window">images/window.png</file>
 	<file alias="textures/debug">images/side1.png</file>
-	<file alias="textures/roof">images/roof.jpg</file>
+	<file alias="textures/roof">images/roof.png</file>
 </qresource>
 </RCC>
 
