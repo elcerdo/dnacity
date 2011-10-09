@@ -50,7 +50,7 @@ void Viewer::initializeGL()
 {
     { // load textures
 	textures[0] = bindTexture(QPixmap(":/textures/debug"),GL_TEXTURE_2D);
-	textures[1] = bindTexture(QPixmap(":/textures/road"),GL_TEXTURE_2D);
+	textures[1] = bindTexture(QPixmap(":/textures/road2"),GL_TEXTURE_2D);
 	textures[2] = bindTexture(QPixmap(":/textures/window"),GL_TEXTURE_2D);
 	textures[3] = bindTexture(QPixmap(":/textures/grass"),GL_TEXTURE_2D);
 	textures[4] = bindTexture(QPixmap(":/textures/roof"),GL_TEXTURE_2D);
@@ -130,9 +130,10 @@ void Viewer::keyPressEvent(QKeyEvent * event) {
 	object = glGenLists(1);
 	glNewList(object, GL_COMPILE);
 	for (int ii=-4; ii<5; ii++)
-	    for (int jj=-4; jj<5; jj++)
-		prepareBuilding(Building::random(Rect(-.5+ii,-.5+jj,1,1)));
-	drawEnvironment(Rect(-5,-5,10,10));
+	    for (int jj=-4; jj<5; jj++) {
+            prepareBuilding(Building::random(Rect(-.5+ii*1.2,-.5+jj*1.2,1,1)));
+            drawEnvironment(Rect(-.5+ii*1.2,-.5+jj*1.2,1,1));
+        }
 	glEndList();
 	updateGL();
 	event->accept();
@@ -189,10 +190,10 @@ void Viewer::drawEnvironment(const Rect& rect) const {
     {
 	glBindTexture(GL_TEXTURE_2D,textures[1]);
 	glBegin(GL_QUADS);
-	glTexCoord2d(0,0); glVertex3d(rect.left()-.5, rect.bottom()+.5, -1e-5);
-	glTexCoord2d(rect.width(),0); glVertex3d(rect.right()+.5, rect.bottom()+.5, -1e-5);
-	glTexCoord2d(rect.width(),rect.height()); glVertex3d(rect.right()+.5, rect.top()-.5, -1e-5);
-	glTexCoord2d(0,rect.height()); glVertex3d(rect.left()-.5, rect.top()-.5, -1e-5);
+	glTexCoord2d(0,0); glVertex3d(rect.left()-.1, rect.bottom()+.1, -1e-3);
+	glTexCoord2d(rect.width(),0); glVertex3d(rect.right()+.1, rect.bottom()+.1, -1e-3);
+	glTexCoord2d(rect.width(),rect.height()); glVertex3d(rect.right()+.1, rect.top()-.1, -1e-3);
+	glTexCoord2d(0,rect.height()); glVertex3d(rect.left()-.1, rect.top()-.1, -1e-3);
 	glEnd();
     }
 }
@@ -262,7 +263,7 @@ void Viewer::drawPiece(const Piece& piece) const
 	glEnd();
     }
 
-    { // draw edges
+/*    { // draw edges
 	qglColor(Qt::red);
 	glBindTexture(GL_TEXTURE_2D,0);
 	glBegin(GL_LINE_STRIP);
@@ -293,7 +294,7 @@ void Viewer::drawPiece(const Piece& piece) const
 	glEnd();
 
 	qglColor(Qt::white);
-    }
+    }*/
 }
 
 
