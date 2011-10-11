@@ -39,13 +39,6 @@ void Viewer::setZRotation(int angle)
     }
 }
 
-void Viewer::setScale(qreal _scale) {
-    if(_scale > 0) {
-        scale = _scale;
-        updateGL();
-    }
-}
-
 void Viewer::initializeGL()
 {
     { // load textures
@@ -54,13 +47,14 @@ void Viewer::initializeGL()
 	textures[2] = bindTexture(QPixmap(":/textures/window"),GL_TEXTURE_2D);
 	textures[3] = bindTexture(QPixmap(":/textures/grass"),GL_TEXTURE_2D);
 	textures[4] = bindTexture(QPixmap(":/textures/roof"),GL_TEXTURE_2D);
+	textures[5] = bindTexture(QPixmap(":/textures/sky"),GL_TEXTURE_2D);
     }
 
     qglClearColor(Qt::black);
     glLineWidth(2.);
     glShadeModel(GL_SMOOTH);
 
-    scale=1.0; xRot=0.0; yRot=0.0; zRot=0.0;
+    xRot=0.0; yRot=0.0; zRot=0.0;
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -90,11 +84,11 @@ void Viewer::paintGL()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    glScalef(scale, scale, scale);
     glTranslated(0.0, 0.0, -10.0);
     glRotated(xRot / 16.0, 1.0, 0.0, 0.0);
     glRotated(yRot / 16.0, 0.0, 1.0, 0.0);
     glRotated(zRot / 16.0, 0.0, 0.0, 1.0);
+    drawSky();
     glScaled(scale,scale,scale);
     glTranslated(0.0, 0.0, -1.0);
     glCallList(object);
@@ -147,16 +141,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     int dx = event->x() - lastPos.x();
     int dy = event->y() - lastPos.y();
 
-    if (event->buttons() & Qt::MidButton) {
-        setScale(scale - (dy/100.0));
-    } else if (event->buttons() & Qt::LeftButton) {
+    if (event->buttons().testFlag(Qt::LeftButton)) {
         setXRotation(xRot - 8 * dy);
         setYRotation(yRot + 8 * dx);
-    } else if (event->buttons() & Qt::RightButton) {
+	event->accept();
+	lastPos = event->pos();
+    } else if (event->buttons().testFlag(Qt::RightButton)) {
         setXRotation(xRot - 8 * dy);
         setZRotation(zRot + 8 * dx);
+	event->accept();
+	lastPos = event->pos();
     }
-    lastPos = event->pos();
+
 }
 
 void Viewer::showBuilding(const Building& building)
@@ -175,6 +171,32 @@ void Viewer::prepareBuilding(const Building& building) const
         drawPiece(piece);
 }
 
+
+void Viewer::drawSky() const {
+    qglColor(Qt::white);
+    glBindTexture(GL_TEXTURE_2D,textures[5]);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    const float radius = 3;
+    
+    for (int ll=0; ll<31; ll++) {
+	const float alpha_0 = ll/32.;
+	const float theta_0 = M_PI/2.*alpha_0;
+	const float alpha_1 = (ll+1)/32.;
+	const float theta_1 = M_PI/2.*alpha_1;
+	glBegin(GL_TRIANGLE_STRIP);
+	for (int kk=0; kk<65; kk++) {
+	    const float phi = -2*M_PI*kk/64;
+	    glTexCoord2d(0.5+.48*cos(phi)*(1-alpha_0),0.5-.48*sin(phi)*(1-alpha_0));
+	    glVertex3d(radius*cos(phi)*cos(theta_0),radius*sin(phi)*cos(theta_0),radius*sin(theta_0));
+	    glTexCoord2d(0.5+.48*cos(phi)*(1-alpha_1),0.5-.48*sin(phi)*(1-alpha_1));
+	    glVertex3d(radius*cos(phi)*cos(theta_1),radius*sin(phi)*cos(theta_1),radius*sin(theta_1));
+	}
+	glEnd();
+    }
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+}
 
 void Viewer::drawEnvironment(const Rect& rect) const {
     {

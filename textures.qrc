@@ -6,6 +6,7 @@
 	<file alias="textures/window">images/window.png</file>
 	<file alias="textures/debug">images/side1.png</file>
 	<file alias="textures/roof">images/roof.png</file>
+	<file alias="textures/sky">images/sky.png</file>
 </qresource>
 </RCC>
 
