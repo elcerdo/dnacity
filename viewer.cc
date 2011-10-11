@@ -54,6 +54,7 @@ void Viewer::initializeGL()
 	textures[2] = bindTexture(QPixmap(":/textures/window"),GL_TEXTURE_2D);
 	textures[3] = bindTexture(QPixmap(":/textures/grass"),GL_TEXTURE_2D);
 	textures[4] = bindTexture(QPixmap(":/textures/roof"),GL_TEXTURE_2D);
+	textures[5] = bindTexture(QPixmap(":/textures/particule"),GL_TEXTURE_2D);
     }
 
     qglClearColor(Qt::black);
